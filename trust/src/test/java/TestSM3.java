@@ -16,7 +16,7 @@ public class TestSM3 {
         byte[] md3 = new byte[32];
         byte[] msg1 = "abc".getBytes();
         byte[] msg2 = "abcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcdabcd".getBytes();
-        byte[] msg3 = "cqp".getBytes();
+        byte[] msg3 = "aaaaa".getBytes();
 
 
         SM3Digest sm3 = new SM3Digest();
@@ -34,5 +34,6 @@ public class TestSM3 {
         sm3.doFinal(md3,0);
         String s3 = new String(Hex.encode(md3));
         System.out.println("msg3:"+ s3);
+        System.out.println("64位16进制字符串：" + s3.length());
     }
 }

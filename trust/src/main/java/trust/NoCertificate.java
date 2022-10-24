@@ -18,7 +18,7 @@ import java.util.HashMap;
  * @author cqp
  * @version 1.0.0
  * @ClassName NoCertificate.java
- * @Description TODO
+ * @Description 无证书公钥体制
  * @createTime 2022年09月19日 14:04:00
  */
 public class NoCertificate {
@@ -51,6 +51,7 @@ public class NoCertificate {
 
 
     static {
+        // 将系统参数存入缓存中
         SM9_CURVE_MAP = new HashMap<String, SM9Curve>();
         KGC_MAP = new HashMap<String, KGC>();
         SM9_MAP = new HashMap<String, SM9>();
@@ -104,22 +105,20 @@ public class NoCertificate {
         return secret;
     }
 
-
     /**
      * 生成完整公钥 sm4 对称加密
-     * @param secert
+     * @param secert sm3 根据用户id计算出的64位杂凑值
      * @param privateKey
      * @return
      */
     public String generateEntirePublicKey(String secert, PrivateKey privateKey){
         SM4Utils sm4 = new SM4Utils();
 
+        // 可以优化前32位和后32位进行异或运算得到 32 位的 sm4key ，sm4.secretKey 标准中为16位，这里需要再看看
         String sm4key = Util.split64to32(secert);
 
         // sm4.secretKey 必须64位
         sm4.secretKey = sm4key;
-        //sm4.secretKey = secert;
-        //sm4.secretKey = "cqpcqpcqpcqpcqpcqpcqpcqpcqpcqpcq";
         sm4.hexString = true;
         String entirePublicKey = sm4.encryptData_ECB(privateKey.toString());
         return entirePublicKey;
