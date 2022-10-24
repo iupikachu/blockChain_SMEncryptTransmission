@@ -489,6 +489,30 @@ public class Util {
         return result;
     }
 
+    /**
+     * 二进制转十六进制
+     * @param binary
+     * @return
+     */
+    public static String binaryStringToHex(String binary) {
+        if (binary == null || binary.equals("") || binary.length() % 8 != 0){
+            return null;
+        }
+        StringBuffer tmp = new StringBuffer();
+        int iTmp = 0;
+        for (int i = 0; i < binary.length(); i += 4)
+        {
+            iTmp = 0;
+            for (int j = 0; j < 4; j++)
+            {
+                iTmp += Integer.parseInt(binary.substring(i + j, i + j + 1)) << (4 - j - 1);
+            }
+            tmp.append(Integer.toHexString(iTmp));
+        }
+        return tmp.toString();
+    }
+
+
 
     public static String AsciiStringToString(String content) {
         String result = "";
@@ -746,16 +770,43 @@ public class Util {
         return str.substring(0,32);
     }
 
-    public static void main(String[] args) {
-        Util util = new Util();
-        byte[] bytes1 = util.twoStringXor("1", "10101010101");
-        for (byte b : bytes1) {
-            System.out.println(b);
+    /**
+     * 将256bit数据高128位和低128位做异或操作得到128位的值作为SM4算法的密钥值
+     * @param originBytes 原字节数组
+     * @return 16进制的32位字符串
+     */
+    public static String mix128HighLowBits(byte[] originBytes){
+        byte[] bytes = new byte[32];
+        for (int i = 0, j = 32; i < 32; i++,j++) {
+            bytes[i] = (byte) (originBytes[i] ^ originBytes[j]);
         }
 
-        System.out.println("------");
-        byte[] bytes2 = util.twoStringXorReverse(bytes1, "1".getBytes());
-        System.out.println(new String(bytes2));
+        return new String(bytes);
+    }
+
+    /**
+     * 将256bit数据高128位和低128位做异或操作得到128位的值作为SM4算法的密钥值
+     * @param originString 原字节数组
+     * @return 16进制的32位字符串
+     */
+    public static String mix128HighLowBits(String originString){
+        StringBuilder sb = new StringBuilder();
+        String binaryString = hexStringToBinary(originString);
+        for (int i = 0,j = 128; i < 128; i++,j++) {
+            int i1 = binaryString.charAt(i) - '0';
+            int i2 = binaryString.charAt(j) - '0';
+            sb.append(i1 ^ i2); // 128位二进制
+        }
+        // 二进制转16进制
+        return binaryStringToHex( sb.toString());
+    }
+
+
+
+
+    public static void main(String[] args) {
+        String s = "136ce3c86e4ed909b76082055a61586af20b4dab674732ebd4b599eef080c9be";
+        System.out.println(mix128HighLowBits(s));
     }
 
 }

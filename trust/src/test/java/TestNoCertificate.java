@@ -3,10 +3,13 @@ import SM9.key.PrivateKey;
 import SM9.result.ResultCipherText;
 import gm.sm4.SM4Utils;
 import it.unisa.dia.gas.plaf.jpbc.field.curve.CurveElement;
+import org.bouncycastle.crypto.digests.SM3Digest;
+import org.bouncycastle.util.encoders.Hex;
 import org.junit.jupiter.api.Test;
 import org.springframework.test.context.event.annotation.BeforeTestClass;
 import trust.NoCertificate;
 import util.SM9Utils;
+import util.Util;
 
 /**
  * @author cqp
@@ -104,6 +107,40 @@ public class TestNoCertificate {
         System.out.println(s);
     }
 
+    // 测试SM3 得到 256 位的杂凑值
+    // 得到64位的16进制字符串
+    // 一个16进制数表示4位
+    @Test
+    public void TestSm3(){
+        byte[] md = new byte[32];
+        byte[] msg = "aaaaa".getBytes();
+        SM3Digest sm3 = new SM3Digest();
+        sm3.update(msg, 0, msg.length);
+        sm3.doFinal(md, 0);
+        String s = new String(Hex.encode(md));
+        System.out.println("msg:" + s);
+        // 杂凑值 136ce3c86e4ed909b76082055a61586af20b4dab674732ebd4b599eef080c9be
+    }
 
+    // 测试SM4 需要128位 32位16进制的密钥串
+    @Test
+    public void testSm4(){
+        String plainText = "I Love You Every Day";
+        String s = Util.byteToHex(plainText.getBytes());
+        SM4Utils sm4 = new SM4Utils();
+
+        System.out.println("原文: " + plainText);
+
+        // 需要将64位的杂凑值做一下异或操作
+        sm4.secretKey = "64EC7C763AB7BF64E2D75FF83A319918";
+        sm4.hexString = true;
+        System.out.println("ECB模式加密");
+        String cipherText = sm4.encryptData_ECB(plainText);
+        System.out.println("密文: " + cipherText);
+
+        // 解密
+        String plainText2 = sm4.decryptData_ECB(cipherText);
+        System.out.println("明文: " + plainText2);
+    }
 
 }
